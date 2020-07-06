@@ -1,8 +1,8 @@
 #include<bits/stdc++.h>
-#include "XMLCheck.h"
-#include "Update_XML.h"
-#include "process_XML.h"
-#include "search_XML.h"
+#include <headers/XMLCheck.h>
+#include <headers/Update_XML.h>
+#include <headers/process_XML.h>
+#include <headers/search_XML.h>
  
 
 
