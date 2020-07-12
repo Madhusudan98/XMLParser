@@ -1,9 +1,25 @@
 #include<bits/stdc++.h>
-#include <headers/XMLCheck.h>
-#include <headers/Update_XML.h>
-#include <headers/process_XML.h>
-#include <headers/search_XML.h>
- 
+#include "XMLCheck.h"
+#include "Update_XML.h"
+#include "process_XML.h"
+#include "search_XML.h"
+
+void print_tags(graph xml_grpah,int nested_level){
+    if(xml_grpah.tag_list.size()==0){
+        return;
+    }
+    std::string indent="";
+    for(int i{0};i<nested_level;i++){
+        indent+="---";
+    }
+    
+    std::cout<<indent<<xml_grpah.tag<<std::endl;
+    for(int i{0};i<xml_grpah.tag_list.size();i++){
+        print_tags(xml_grpah.tag_list[i],nested_level+1);
+    }
+    return;
+}
+
 
 
 int main(){
@@ -17,28 +33,33 @@ int main(){
     char line;
     std::string xml_str="";
     std::getline(std::cin>> std::ws,filename);
-    std::ifstream xml_doc(filename);
-    if(!xml_doc){
+    std::ifstream xml_document(filename);
+    if(!xml_document){
         std::cout<<"File not found"<<std::endl;
     }
     else{
-        while(xml_doc.get(line)){
+        while(xml_document.get(line)){
             xml_str+=line;
         }
-        xml_doc.close();
+        xml_document.close();
     }
-    int start=1;
+    int start=0;
     if(xml_str[0]=='<' && xml_str[1]=='?'){
-        while(xml_str[start]!='<'){
+        while(xml_str[start]!='>'){
             start++;
         }
     }
-    xml_str=xml_str.substr(start-1,xml_str.length()-start+1);
-    std::vector<std::string> tag_vector=check_xml(xml_str);
-    if(tag_vector.size()==0){
+    start++;
+    xml_str=xml_str.substr(start,xml_str.length()-start+1);
+    std::smatch xml_start_match;
+    std::regex reg ("(<[^<]*>)");
+    std::regex_search(xml_str,xml_start_match,reg);
+    start=xml_start_match.position();
+    xml_str=xml_str.substr(start,xml_str.length()-start+1);
+    graph xml_graph=tag_separtor(xml_str);
+    if(check_xml(xml_str)==false){
         return 0;
     }
-    graph xml_graph=tag_separtor(xml_str);
     std::cout<<std::endl;
     std::cout<<std::endl;
     std::cout<<std::endl;
@@ -56,7 +77,8 @@ int main(){
         std::cout<<"6. Close the Program"<<std::endl;
         std::cin>>input;
         if(input=="1"){
-            print_tags(tag_vector);
+            print_tags(xml_graph,0);
+            std::cout<<std::endl;std::cout<<std::endl;std::cout<<std::endl;std::cout<<std::endl;std::cout<<std::endl;
         }
         else if(input=="2"){
             std::cout<<std::endl;
@@ -71,6 +93,10 @@ int main(){
             std::cout<<std::endl;
         }
         else if(input=="3"){
+            std::cout<<"1. To update an Element"<<std::endl;
+            std::cout<<"2. To update an Attribute"<<std::endl;
+            std::string element_attribute;
+            std::cin>>element_attribute;
             std::cout<<"To update a value give input of position in form of tag1[i].tag[j].tag3[k]"<<std::endl;
             std::string position;
             std::getline(std::cin>> std::ws,position);
@@ -80,7 +106,15 @@ int main(){
             std::cout<<std::endl;
             std::cout<<std::endl;
             std::string choice;
-            update_xml(xml_str,input_value,position,true);
+            if(element_attribute=="1"){
+            update_xml(xml_str,input_value,position,true,false);
+            }
+            else if(element_attribute=="2") {
+                update_xml(xml_str,input_value,position,true,true);
+            }
+            else{
+                std::cout<<"incorrect input"<<std::endl;
+            }
             std::cout<<"1. To see the update xml"<<std::endl;
             std::cout<<"0. Continue"<<std::endl;
             std::cin>>choice;
@@ -95,9 +129,9 @@ int main(){
             choice.clear();
             std::cin>>choice;
             if(choice=="2"){
-                std::ofstream out(filename);
-                out<<xml_str;
-                out.close();
+                std::ofstream out("updated"+filename);
+               out << xml_str;
+               out.close();
             }
         }
         else if(input=="4"){
@@ -110,7 +144,7 @@ int main(){
             std::cout<<std::endl;
             std::cout<<std::endl;
             std::string choice;
-            update_xml(xml_str,input_value,position,false);
+            update_xml(xml_str,input_value,position,false,false);
             std::cout<<"1. To see the update xml"<<std::endl;
             std::cout<<"0. Continue"<<std::endl;
             std::cin>>choice;
@@ -122,9 +156,9 @@ int main(){
             choice.clear();
             std::cin>>choice;
             if(choice=="2"){
-                std::ofstream out(filename);
-                out<<xml_str;
-                out.close();
+                std::ofstream out("updated"+filename);
+               out << xml_str;
+               out.close();
         }
         }
         else if(input=="5"){
