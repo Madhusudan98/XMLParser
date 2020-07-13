@@ -48,8 +48,9 @@ int main(){
         while(xml_str[start]!='>'){
             start++;
         }
+        start++;
     }
-    start++;
+    
     xml_str=xml_str.substr(start,xml_str.length()-start+1);
     std::smatch xml_start_match;
     std::regex reg ("(<[^<]*>)");
