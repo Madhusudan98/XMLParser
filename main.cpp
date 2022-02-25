@@ -1,8 +1,14 @@
-#include<bits/stdc++.h>
-#include "/headers/XMLCheck.h"
-#include "/headers/Update_XML.h"
-#include "/headers/process_XML.h"
-#include "/headers/search_XML.h"
+#include<iostream>
+#include<vector>
+#include<string>
+#include<stack>
+#include<regex>
+#include <sstream>
+#include <fstream>
+#include "headers/XMLCheck.h"
+#include "headers/Update_XML.h"
+#include "headers/process_XML.h"
+#include "headers/search_XML.h"
 
 void print_tags(graph xml_grpah,int nested_level){
     if(xml_grpah.tag_list.size()==0){
@@ -32,10 +38,12 @@ int main(){
     
     char line;
     std::string xml_str="";
+    //reads file from the file system
     std::getline(std::cin>> std::ws,filename);
     std::ifstream xml_document(filename);
     if(!xml_document){
         std::cout<<"File not found"<<std::endl;
+        return 0;
     }
     else{
         while(xml_document.get(line)){
@@ -44,16 +52,18 @@ int main(){
         xml_document.close();
     }
     int start=0;
+    //To skip lines like  - <?xml version="1.0" encoding="ISO-8859-1"?>  
     if(xml_str[0]=='<' && xml_str[1]=='?'){
         while(xml_str[start]!='>'){
             start++;
         }
         start++;
     }
-    
+    //remove the above mentioned xml metadata
     xml_str=xml_str.substr(start,xml_str.length()-start+1);
     std::smatch xml_start_match;
     std::regex reg ("(<[^<]*>)");
+    //gets the starting of xml, skips whitespace or other rather chracters before xml actually starts
     std::regex_search(xml_str,xml_start_match,reg);
     start=xml_start_match.position();
     xml_str=xml_str.substr(start,xml_str.length()-start+1);

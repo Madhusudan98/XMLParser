@@ -64,7 +64,6 @@ graph tag_separtor(std::string xml_str){
     if(xml_str[0]!='<'){
         xml_graph.tag=xml_str;
         return xml_graph;
-    
     }
     else{
         int start;
@@ -75,6 +74,7 @@ graph tag_separtor(std::string xml_str){
                 break;
             }
         }
+        //gets the opening tag
         main_tag=xml_str.substr(0,start);
         xml_graph=to_graph_object(main_tag);
         if(xml_graph.tag.substr(0,18)=="__selfClosingTag__"){
