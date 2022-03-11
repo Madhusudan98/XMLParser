@@ -25,11 +25,83 @@ void print_tags(graph xml_grpah,int nested_level){
     }
     return;
 }
+bool compare_graph_tag(graph xml1, graph xml2){
+    return xml1.tag<xml2.tag;
+}
 
+
+std::string printJSON(graph xml_graph,std::string indent,bool tag_already_present = false){
+    if(xml_graph.tag_list.size()==0){
+//        return  indent+"#text : {\"" +xml_graph.tag + "\"";
+        return  indent + "\""+"text"+"\":\"" + xml_graph.tag + "\"";
+    }
+    if(xml_graph.is_attribute){
+        xml_graph.tag_list[0].tag .erase(std::remove(xml_graph.tag_list[0].tag.begin(), xml_graph.tag_list[0].tag .end(), '\n       '), xml_graph.tag_list[0].tag .end());
+         return indent +"  "+ "\"@"+xml_graph.tag + "\" : " + xml_graph.tag_list[0].tag + "";
+    }
+    if(xml_graph.tag_list.size()==1 && xml_graph.tag_list[0].tag_list.size()==0){
+        xml_graph.tag_list[0].tag .erase(std::remove(xml_graph.tag_list[0].tag.begin(), xml_graph.tag_list[0].tag .end(), '\n       '), xml_graph.tag_list[0].tag .end());
+        return indent +"  "+ "\""+xml_graph.tag + "\" : \"" + xml_graph.tag_list[0].tag + "\"";
+    }
+    else{
+        //gets all the element which share the same key
+        std::sort(xml_graph.tag_list.begin(),xml_graph.tag_list.end(), compare_graph_tag);
+        std::map<std::string,int> tag_count;
+        int n = xml_graph.tag_list.size();
+        for(int i=0;i<n;i++){
+            tag_count[xml_graph.tag_list[i].tag]++;
+        }
+
+        std::string currKey="";
+        if(tag_already_present){
+            currKey+="{\n";
+        }
+        else{
+            currKey+= indent + "{\n\"" + xml_graph.tag + "\" : {\n";
+        }
+        indent+="  ";
+        for(int i = 0;i<n;i++){
+            if(tag_count[xml_graph.tag_list[i].tag]>1){
+                std::string current_tag = xml_graph.tag_list[i].tag;
+                currKey+= indent + indent+ "\"" + current_tag + "\" : ";
+                currKey+="[";
+                tag_count[xml_graph.tag_list[i].tag]--;
+                while (xml_graph.tag_list[i].tag==current_tag){
+                    bool tag_already_present = true;
+                    std::string  temp_indent = "  ";
+                    currKey += printJSON(xml_graph.tag_list[i],temp_indent,tag_already_present);
+                    tag_count[xml_graph.tag_list[i].tag]--;
+                    if(tag_count[xml_graph.tag_list[i].tag]>=0){
+                        currKey+= ",\n";
+                    }
+                    i++;
+                }
+                i--;
+                if(i!=xml_graph.tag_list.size()-1){
+                    currKey+="],\n";
+                }
+                else{
+                    currKey+="]\n";
+                }
+            }
+            else{
+                currKey+= "";
+                currKey += printJSON(xml_graph.tag_list[i],indent);
+                if(i!=xml_graph.tag_list.size()-1){
+                    currKey+= ",\n";
+                }
+            }
+
+        }
+        currKey+="";
+        currKey+=indent +" \n}";
+        return  currKey;
+    }
+}
 
 
 int main(){
-    
+
     std::cout<<"Welcome to the XML Parser program"<<std::endl;
     std::cout<<std::endl;
     std::cout<<"Please Enter the path of your file, followed by its name"<<std::endl;
@@ -88,7 +160,13 @@ int main(){
         std::cout<<"6. Close the Program"<<std::endl;
         std::cin>>input;
         if(input=="1"){
-            print_tags(xml_graph,0);
+//            print_tags(xml_graph,0);
+            // std::cout<<"Calling printJSON func"<<std::endl;
+            std::string xml_json = "{";
+            std::string indent = "";
+            xml_json = printJSON(xml_graph,indent);
+            xml_json+="}";
+            std::cout<<xml_json<<std::endl;
             std::cout<<std::endl;std::cout<<std::endl;std::cout<<std::endl;std::cout<<std::endl;std::cout<<std::endl;
         }
         else if(input=="2"){

@@ -4,6 +4,7 @@
 struct graph{
     std::string tag;
     std::vector<graph> tag_list;
+    bool is_attribute = false;
 };
 
 
@@ -33,7 +34,7 @@ graph to_graph_object(std::string opening_tag){
         graph attribute_name_graph;
         graph attribute_value_graph;
         attribute_name_graph.tag=matches[1].str();
-        
+        attribute_name_graph.is_attribute = true;
         attribute_value_graph.tag=matches[2].str();
         attribute_name_graph.tag_list.push_back(attribute_value_graph);
         xml_graph.tag_list.push_back(attribute_name_graph);
